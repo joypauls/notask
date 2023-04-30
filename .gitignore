@@ -14,6 +14,8 @@ coverage.out
 badge.svg
 old
 fst
+_app
+_fst
 
 # Binaries for programs and plugins
 *.exe

@@ -7,7 +7,7 @@ do
 	split=(${platform//\// })
 	GOOS=${split[0]}
 	GOARCH=${split[1]}
-	file_name="./bin/scry-"$GOOS"-"$GOARCH
+	file_name="./bin/notask-"$GOOS"-"$GOARCH
 	# if [ $GOOS = "windows" ]; then
 	# 	file_name+=".exe"
 	# fi
