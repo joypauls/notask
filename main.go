@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"encoding/json"
 	"flag"
 	"fmt"
@@ -76,6 +77,66 @@ func readDotEnvFile(key string) string {
 	return os.Getenv(key)
 }
 
+// PrettyPrint to print struct in a readable way
+func PrettyPrint(i interface{}) string {
+	s, _ := json.MarshalIndent(i, "", "\t")
+	return string(s)
+}
+
+func getDatabase(client *http.Client, id string, key string) (Database, error) {
+	requestURL := fmt.Sprintf("https://api.notion.com/v1/databases/%s", id)
+	requestAuthValue := fmt.Sprintf("Bearer %s", key)
+	request, _ := http.NewRequest("GET", requestURL, nil)
+	request.Header.Add("Authorization", requestAuthValue)
+	request.Header.Add("Notion-Version", "2022-06-28")
+
+	response, err := client.Do(request)
+	if err != nil {
+		fmt.Printf("error making http request: %s\n", err)
+		os.Exit(1)
+	}
+
+	defer response.Body.Close()
+	body, err := ioutil.ReadAll(response.Body)
+
+	var db Database
+	err = json.Unmarshal(body, &db)
+	// if err := json.Unmarshal(body, &db); err != nil { // Parse []byte to the go struct pointer
+	// 	fmt.Println("Can not unmarshal JSON")
+	// }
+	return db, err
+}
+
+// func getPages(client *http.Client, filter FilterPages, id string, key string) (Database, error) {
+func getPages(client *http.Client, filter FilterPages, id string, key string) (QueryResult, error) {
+	// build request
+	requestURL := fmt.Sprintf("https://api.notion.com/v1/databases/%s/query", id)
+	requestAuthValue := fmt.Sprintf("Bearer %s", key)
+	bodyJson, _ := json.Marshal(filter)
+	request, _ := http.NewRequest("POST", requestURL, bytes.NewBuffer(bodyJson))
+	request.Header.Set("Content-Type", "application/json")
+	request.Header.Add("Authorization", requestAuthValue)
+	request.Header.Add("Notion-Version", "2022-06-28")
+
+	// do request
+	response, err := client.Do(request)
+	if err != nil {
+		fmt.Printf("error making http request: %s\n", err)
+		os.Exit(1)
+	}
+
+	// read result
+	defer response.Body.Close()
+	body, err := ioutil.ReadAll(response.Body)
+	// fmt.Println(string(body))
+	var qr QueryResult
+	err = json.Unmarshal(body, &qr)
+	// if err := json.Unmarshal(body, &qr); err != nil { // Parse []byte to the go struct pointer
+	// 	fmt.Println("Can not unmarshal JSON")
+	// }
+	return qr, err
+}
+
 func main() {
 	defer os.Exit(0)
 	// read config file or set defaults
@@ -85,11 +146,13 @@ func main() {
 	// set custom usage output (-h or --help)
 	flag.Usage = printUsageText
 
-	// inefficient, should just hydrate a struct
+	// inefficient, should just hydrate a config struct
 	apiKey := readDotEnvFile("NOTION_API_KEY")
-	database := readDotEnvFile("NOTION_DATABASE_ID")
-	log.Print(apiKey)
-	log.Print(database)
+	databasedId := readDotEnvFile("NOTION_DATABASE_ID")
+	// notionVersion := readDotEnvFile("NOTION_DATABASE_ID")
+
+	// log.Print(apiKey)
+	// log.Print(databasedId)
 
 	// parse flags
 	// useEmojiFlag := flag.Bool("e", false, "Use emoji in UI (sparingly)")
@@ -121,35 +184,61 @@ func main() {
 	// render(config)
 
 	client := &http.Client{}
-	requestURL := fmt.Sprintf("https://api.notion.com/v1/databases/%s", database)
-	requestAuthValue := fmt.Sprintf("Bearer %s", apiKey)
-	request, _ := http.NewRequest("GET", requestURL, nil)
-	request.Header.Add("Authorization", requestAuthValue)
-	request.Header.Add("Notion-Version", "2022-06-28")
+	// requestURL := fmt.Sprintf("https://api.notion.com/v1/databases/%s", database)
+	// requestAuthValue := fmt.Sprintf("Bearer %s", apiKey)
+	// request, _ := http.NewRequest("GET", requestURL, nil)
+	// request.Header.Add("Authorization", requestAuthValue)
+	// request.Header.Add("Notion-Version", "2022-06-28")
 
-	response, err := client.Do(request)
-	if err != nil {
-		fmt.Printf("error making http request: %s\n", err)
-		os.Exit(1)
-	}
+	// response, err := client.Do(request)
+	// if err != nil {
+	// 	fmt.Printf("error making http request: %s\n", err)
+	// 	os.Exit(1)
+	// }
 
-	defer response.Body.Close()
-	body, err := ioutil.ReadAll(response.Body)
+	// defer response.Body.Close()
+	// body, err := ioutil.ReadAll(response.Body)
 
-	fmt.Printf("client: got response!\n")
-	fmt.Printf("client: status code: %d\n", response.StatusCode)
+	// fmt.Printf("client: got response!\n")
+	// fmt.Printf("client: status code: %d\n", response.StatusCode)
 	// fmt.Println(string(body))
 
-	var db Database
-	if err := json.Unmarshal(body, &db); err != nil { // Parse []byte to the go struct pointer
-		fmt.Println("Can not unmarshal JSON")
+	// db, err := getDatabase(client, databasedId, apiKey)
+	// if err != nil { // Parse []byte to the go struct pointer
+	// 	fmt.Println("Can not unmarshal JSON")
+	// }
+	// fmt.Println(PrettyPrint(db.Properties.Status.Status.Options))
+	// fmt.Println(PrettyPrint(db.Properties.Status.Status.Options))
+	// fmt.Println(PrettyPrint(db.Properties.Status.Status.Options))
+
+	// statuses := db.Properties.Status.Status.Options
+	// desiredStatus := "Not started"
+	// var desiredStatusId string
+	// for i := range statuses {
+	// 	if statuses[i].Name == desiredStatus {
+	// 		// fmt.Println(PrettyPrint(statuses[i].Id))
+	// 		desiredStatusId = statuses[i].Id
+	// 	}
+	// }
+
+	// fmt.Println(PrettyPrint(desiredStatusId))
+
+	// Query DB
+	// db, err := getDatabase(client, databasedId, apiKey)
+	// if err != nil { // Parse []byte to the go struct pointer
+	// 	fmt.Println("Can not unmarshal JSON")
+	// }
+	// fmt.Println(PrettyPrint(db.Properties.Status.Status.Options))
+
+	//Create user struct which need to post.
+	filter := FilterPages{
+		Filter: Filter{Property: "State", Status: Status{"Not started"}},
 	}
-	fmt.Println(PrettyPrint(db))
+	qr, _ := getPages(client, filter, databasedId, apiKey)
+	// fmt.Println(PrettyPrint(qr.Results))
 
-}
-
-// PrettyPrint to print struct in a readable way
-func PrettyPrint(i interface{}) string {
-	s, _ := json.MarshalIndent(i, "", "\t")
-	return string(s)
+	fetchedPages := qr.Results
+	for i := range fetchedPages {
+		fmt.Printf("%s\n", fetchedPages[i].Properties.Name.Title[0].Text.Content)
+	}
 }
