@@ -1,8 +1,10 @@
 package main
 
 import (
+	"encoding/json"
 	"flag"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -124,14 +126,30 @@ func main() {
 	request, _ := http.NewRequest("GET", requestURL, nil)
 	request.Header.Add("Authorization", requestAuthValue)
 	request.Header.Add("Notion-Version", "2022-06-28")
-	res, err := client.Do(request)
+
+	response, err := client.Do(request)
 	if err != nil {
 		fmt.Printf("error making http request: %s\n", err)
 		os.Exit(1)
 	}
 
-	fmt.Printf("client: got response!\n")
-	fmt.Printf("client: status code: %d\n", res.StatusCode)
-	// fmt.Print(res)
+	defer response.Body.Close()
+	body, err := ioutil.ReadAll(response.Body)
 
+	fmt.Printf("client: got response!\n")
+	fmt.Printf("client: status code: %d\n", response.StatusCode)
+	// fmt.Println(string(body))
+
+	var db Database
+	if err := json.Unmarshal(body, &db); err != nil { // Parse []byte to the go struct pointer
+		fmt.Println("Can not unmarshal JSON")
+	}
+	fmt.Println(PrettyPrint(db))
+
+}
+
+// PrettyPrint to print struct in a readable way
+func PrettyPrint(i interface{}) string {
+	s, _ := json.MarshalIndent(i, "", "\t")
+	return string(s)
 }
