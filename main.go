@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/fatih/color"
 	"github.com/joho/godotenv"
 	// "github.com/joypauls/notion-task-cli/app"
 	// "github.com/joypauls/notion-task-cli/fst"
@@ -184,51 +185,6 @@ func main() {
 	// render(config)
 
 	client := &http.Client{}
-	// requestURL := fmt.Sprintf("https://api.notion.com/v1/databases/%s", database)
-	// requestAuthValue := fmt.Sprintf("Bearer %s", apiKey)
-	// request, _ := http.NewRequest("GET", requestURL, nil)
-	// request.Header.Add("Authorization", requestAuthValue)
-	// request.Header.Add("Notion-Version", "2022-06-28")
-
-	// response, err := client.Do(request)
-	// if err != nil {
-	// 	fmt.Printf("error making http request: %s\n", err)
-	// 	os.Exit(1)
-	// }
-
-	// defer response.Body.Close()
-	// body, err := ioutil.ReadAll(response.Body)
-
-	// fmt.Printf("client: got response!\n")
-	// fmt.Printf("client: status code: %d\n", response.StatusCode)
-	// fmt.Println(string(body))
-
-	// db, err := getDatabase(client, databasedId, apiKey)
-	// if err != nil { // Parse []byte to the go struct pointer
-	// 	fmt.Println("Can not unmarshal JSON")
-	// }
-	// fmt.Println(PrettyPrint(db.Properties.Status.Status.Options))
-	// fmt.Println(PrettyPrint(db.Properties.Status.Status.Options))
-	// fmt.Println(PrettyPrint(db.Properties.Status.Status.Options))
-
-	// statuses := db.Properties.Status.Status.Options
-	// desiredStatus := "Not started"
-	// var desiredStatusId string
-	// for i := range statuses {
-	// 	if statuses[i].Name == desiredStatus {
-	// 		// fmt.Println(PrettyPrint(statuses[i].Id))
-	// 		desiredStatusId = statuses[i].Id
-	// 	}
-	// }
-
-	// fmt.Println(PrettyPrint(desiredStatusId))
-
-	// Query DB
-	// db, err := getDatabase(client, databasedId, apiKey)
-	// if err != nil { // Parse []byte to the go struct pointer
-	// 	fmt.Println("Can not unmarshal JSON")
-	// }
-	// fmt.Println(PrettyPrint(db.Properties.Status.Status.Options))
 
 	//Create user struct which need to post.
 	filter := FilterPages{
@@ -238,7 +194,19 @@ func main() {
 	// fmt.Println(PrettyPrint(qr.Results))
 
 	fetchedPages := qr.Results
+
 	for i := range fetchedPages {
-		fmt.Printf("%s\n", fetchedPages[i].Properties.Name.Title[0].Text.Content)
+		// fmt.Printf("%s\n", fetchedPages[i].Properties.Name.Title[0].Text.Content)
+		blueBg := color.New(color.BgBlue).SprintFunc()
+		// blueFg := color.New(color.FgBlue).SprintFunc()
+		fmt.Printf(
+			"%s  %s  %s\n",
+			// padding(fetchedPages[i].Properties.State.Status.Name),
+			// blueFg(fetchedPages[i].CreatedTime.Format("(Mon) 2 Jan 2006 15:04:05")),
+			blueBg(padding(fetchedPages[i].Properties.Name.Title[0].Text.Content)),
+			fetchedPages[i].CreatedTime.Format("2006-01-02 15:04:05"),
+			// blueBg(padding(fetchedPages[i].Properties.Name.Title[0].Text.Content)),
+			fetchedPages[i].Url,
+		)
 	}
 }

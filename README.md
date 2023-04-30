@@ -7,21 +7,7 @@
 
 > :warning: **WIP**: This is just a prototype, use at own risk!
 
-# scry :crystal_ball:
-
-A terminal-based file system explorer written in Go intuitive and snappy enough to keep up with your thoughts! Intended to exist in the space somewhere between the `ls` utility and a full-featured GUI file manager like Ranger to make some common tasks easy, quick, and fun.
-
-This project makes heavy use of the wonderful [tcell](https://github.com/gdamore/tcell) Go package.
-
-## Quick Start
-
-Check out the documentation [website](joypauls.github.io/scry/) for the best experience, thank you!
-
-## Configuration
-
-Directory: `~/.scry/`
-Config File: `~/.scry/config.yaml`
-Favorites Store: `~/.scry/favorites.json`
+# NoTask
 
 ## Dev Stuff
 
