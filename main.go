@@ -12,8 +12,6 @@ import (
 
 	"github.com/fatih/color"
 	"github.com/joho/godotenv"
-	// "github.com/joypauls/notion-task-cli/app"
-	// "github.com/joypauls/notion-task-cli/fst"
 )
 
 // This is overwritten at compile time with build flags with the current tag
@@ -78,13 +76,7 @@ func readDotEnvFile(key string) string {
 	return os.Getenv(key)
 }
 
-// PrettyPrint to print struct in a readable way
-func PrettyPrint(i interface{}) string {
-	s, _ := json.MarshalIndent(i, "", "\t")
-	return string(s)
-}
-
-func getDatabase(client *http.Client, id string, key string) (Database, error) {
+func fetchDatabase(client *http.Client, id string, key string) (Database, error) {
 	requestURL := fmt.Sprintf("https://api.notion.com/v1/databases/%s", id)
 	requestAuthValue := fmt.Sprintf("Bearer %s", key)
 	request, _ := http.NewRequest("GET", requestURL, nil)
@@ -108,8 +100,7 @@ func getDatabase(client *http.Client, id string, key string) (Database, error) {
 	return db, err
 }
 
-// func getPages(client *http.Client, filter FilterPages, id string, key string) (Database, error) {
-func getPages(client *http.Client, filter FilterPages, id string, key string) (QueryResult, error) {
+func fetchPages(client *http.Client, filter FilterPages, id string, key string) (QueryResult, error) {
 	// build request
 	requestURL := fmt.Sprintf("https://api.notion.com/v1/databases/%s/query", id)
 	requestAuthValue := fmt.Sprintf("Bearer %s", key)
@@ -136,6 +127,60 @@ func getPages(client *http.Client, filter FilterPages, id string, key string) (Q
 	// 	fmt.Println("Can not unmarshal JSON")
 	// }
 	return qr, err
+}
+
+func insertPage(client *http.Client, newPage PageRequest, id string, key string) {
+	// build request
+	requestURL := "https://api.notion.com/v1/pages"
+	requestAuthValue := fmt.Sprintf("Bearer %s", key)
+	bodyJson, _ := json.Marshal(newPage)
+	request, _ := http.NewRequest("POST", requestURL, bytes.NewBuffer(bodyJson))
+	request.Header.Set("Content-Type", "application/json")
+	request.Header.Add("Authorization", requestAuthValue)
+	request.Header.Add("Notion-Version", "2022-06-28")
+
+	// do request
+	response, err := client.Do(request)
+	if err != nil {
+		fmt.Printf("error making http request: %s\n", err)
+		os.Exit(1)
+	}
+
+	// read result
+	defer response.Body.Close()
+	body, err := ioutil.ReadAll(response.Body)
+	fmt.Println(response.StatusCode)
+	fmt.Println(string(body))
+	// var qr QueryResult
+	// err = json.Unmarshal(body, &qr)
+	// return qr, err
+}
+
+func printBoard(client *http.Client, id string, key string) {
+	blueBg := color.New(color.BgBlue).SprintFunc()
+	blueFg := color.New(color.FgBlue).SprintFunc()
+
+	//Create user struct which need to post.
+	filter := FilterPages{
+		Filter: Filter{Property: "State", Status: Status{"Not started"}},
+	}
+	qr, _ := fetchPages(client, filter, id, key)
+	fetchedPages := qr.Results
+	db, _ := fetchDatabase(client, id, key)
+	dbName := db.Title[0].Text.Content
+	fmt.Println("Board: ", blueFg(dbName))
+	for i := range fetchedPages {
+		// fmt.Printf("%s\n", fetchedPages[i].Properties.Name.Title[0].Text.Content)
+		fmt.Printf(
+			"%s  %s  %s\n",
+			// padding(fetchedPages[i].Properties.State.Status.Name),
+			// blueFg(fetchedPages[i].CreatedTime.Format("(Mon) 2 Jan 2006 15:04:05")),
+			blueBg(padding(fetchedPages[i].Properties.Name.Title[0].Text.Content)),
+			fetchedPages[i].CreatedTime.Format("2006-01-02 15:04:05"),
+			// blueBg(padding(fetchedPages[i].Properties.Name.Title[0].Text.Content)),
+			fetchedPages[i].Url,
+		)
+	}
 }
 
 func main() {
@@ -185,28 +230,12 @@ func main() {
 	// render(config)
 
 	client := &http.Client{}
+	printBoard(client, databasedId, apiKey)
 
-	//Create user struct which need to post.
-	filter := FilterPages{
-		Filter: Filter{Property: "State", Status: Status{"Not started"}},
-	}
-	qr, _ := getPages(client, filter, databasedId, apiKey)
-	// fmt.Println(PrettyPrint(qr.Results))
+	// newPage := PageRequest{
+	// 	Parent:     Parent{DatabaseId: databasedId},
+	// 	Properties: Properties{Name: Name{Title: []Title{{Text{Content: "dsfasd"}}}}},
+	// }
+	// insertPage(client, newPage, databasedId, apiKey)
 
-	fetchedPages := qr.Results
-
-	for i := range fetchedPages {
-		// fmt.Printf("%s\n", fetchedPages[i].Properties.Name.Title[0].Text.Content)
-		blueBg := color.New(color.BgBlue).SprintFunc()
-		// blueFg := color.New(color.FgBlue).SprintFunc()
-		fmt.Printf(
-			"%s  %s  %s\n",
-			// padding(fetchedPages[i].Properties.State.Status.Name),
-			// blueFg(fetchedPages[i].CreatedTime.Format("(Mon) 2 Jan 2006 15:04:05")),
-			blueBg(padding(fetchedPages[i].Properties.Name.Title[0].Text.Content)),
-			fetchedPages[i].CreatedTime.Format("2006-01-02 15:04:05"),
-			// blueBg(padding(fetchedPages[i].Properties.Name.Title[0].Text.Content)),
-			fetchedPages[i].Url,
-		)
-	}
 }

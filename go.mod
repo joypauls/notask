@@ -1,4 +1,4 @@
-module github.com/joypauls/notion-task-cli
+module github.com/joypauls/notask
 
 go 1.17
 

@@ -146,6 +146,33 @@ type QueryResult struct {
 	} `json:"page"`
 }
 
+type Parent struct {
+	DatabaseId string `json:"database_id"`
+}
+
+type Text struct {
+	Content string `json:"content"`
+}
+
+type Title struct {
+	Text struct {
+		Content string `json:"content"`
+	} `json:"text"`
+}
+
+type Name struct {
+	Title []Title `json:"title"`
+}
+
+type Properties struct {
+	Name Name `json:"Name"`
+}
+
+type PageRequest struct {
+	Parent     Parent     `json:"parent"`
+	Properties Properties `json:"properties"`
+}
+
 // type Property string
 type Status struct {
 	Equals string `json:"equals"`
