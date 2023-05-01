@@ -25,8 +25,8 @@ func Execute() {
 
 func init() {
 	viper.AddConfigPath(".")
-	viper.SetConfigType("env")
-	viper.SetConfigFile(".env")
+	viper.SetConfigType("yaml")
+	viper.SetConfigFile(".notask.yaml")
 
 	if err := viper.ReadInConfig(); err != nil {
 		panic("Ah!")

@@ -1,5 +1,8 @@
 # project-specific
 .env
+.notask.yaml
+
+
 notion
 notask
 notion-task-cli

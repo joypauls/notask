@@ -1,7 +1,7 @@
 ![Build Status](https://img.shields.io/github/workflow/status/joypauls/notask/Build)
 ![Latest Release](https://img.shields.io/github/v/release/joypauls/notask?include_prereleases)
 [![Go Report](https://goreportcard.com/badge/github.com/joypauls/notask)](https://goreportcard.com/badge/github.com/joypauls/notask)
-![Code Coverage](https://storage.googleapis.com/notask-build/code-coverage.svg)
+<!-- ![Code Coverage](https://storage.googleapis.com/notask-build/code-coverage.svg) -->
 ![Go Version](https://img.shields.io/github/go-mod/go-version/joypauls/notask)
 [![go.dev Reference](https://img.shields.io/badge/go.dev-reference-007d9c?logo=go&logoColor=white)](https://pkg.go.dev/github.com/joypauls/notask)
 
@@ -27,7 +27,7 @@ If you're interested in hacking on this project, make sure to check ![this](#dev
 - Hardware
   - Dev machine is an M1 MacBook Air running MacOS **Ventura 13.3.1**
 
-`cp .env-template .env`
+`cp .notask.yaml-template .notask.yaml`
 
 ### Release a New Version
 

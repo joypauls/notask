@@ -21,8 +21,8 @@ var boardCmd = &cobra.Command{
 		spin.Start()
 
 		// inefficient, should just hydrate a config struct
-		apiKey := viper.GetString("NOTION_API_KEY")
-		databasedId := viper.GetString("NOTION_DATABASE_ID")
+		apiKey := viper.GetString("apiKey")
+		databasedId := viper.GetString("databaseId")
 		client := &http.Client{}
 
 		qr, db := src.FetchBoard(client, databasedId, apiKey)
