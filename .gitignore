@@ -16,6 +16,7 @@ old
 fst
 _app
 _fst
+_old
 
 # Binaries for programs and plugins
 *.exe

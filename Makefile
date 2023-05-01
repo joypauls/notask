@@ -3,11 +3,13 @@ TAG_COMMIT := $(shell git rev-list --abbrev-commit --tags --max-count=1)
 TAG := $(shell git describe --abbrev=0 --tags ${TAG_COMMIT} 2>/dev/null || true)
 
 build:
-	go build -ldflags="-s -w -X main.version=$(TAG)" -o ./bin/${EXECUTABLE_NAME}-darwin-arm64
+	go build -ldflags="-s -w -X cmd.root.version=$(TAG)" -o ./bin/${EXECUTABLE_NAME}-darwin-arm64
 
 run:
 	go build -o ${EXECUTABLE_NAME}
-	./${EXECUTABLE_NAME}
+	./${EXECUTABLE_NAME} version
+	# ./${EXECUTABLE_NAME} add "This is a new task."
+	./${EXECUTABLE_NAME} board
 
 dev-setup:
 	sh ./dev-setup.sh

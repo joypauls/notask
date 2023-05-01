@@ -7,7 +7,7 @@
 
 > :warning: **WIP**: This is just a prototype, use at own risk!
 
-# NoTask: A Notion CLI Tool
+# Notask: an oversimplified Notion client
 
 ## Dev Stuff
 
