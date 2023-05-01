@@ -9,7 +9,23 @@
 
 # Notask: an oversimplified Notion client
 
-## Dev Stuff
+Stay focused with **notask** - a distraction-free interface to manage a Notion database (such as a ![Board](https://www.notion.so/help/boards)) at the command line through ![Notion's API](https://developers.notion.com/docs/getting-started). 
+
+Features:
+- View a database
+- Add a new page
+
+If you're interested in hacking on this project, make sure to check ![this](#developer-stuff) out.
+
+## Developer Stuff
+
+### Compatibility/Environment
+
+- Notion
+  - Desktop app version **2.1.15** to verify actions in dev
+  - Web app in Google Chrome to verify actions in dev
+- Hardware
+  - Dev machine is an M1 MacBook Air running MacOS **Ventura 13.3.1**
 
 `cp .env-template .env`
 

@@ -155,28 +155,32 @@ func InsertPage(client *http.Client, newPage PageRequest, id string, key string)
 	// return qr, err
 }
 
-func PrintBoard(client *http.Client, id string, key string) {
-	blueBg := color.New(color.BgBlue).SprintFunc()
-	blueFg := color.New(color.FgBlue).SprintFunc()
+func FetchBoard(client *http.Client, id string, key string) (QueryResult, Database) {
 
 	//Create user struct which need to post.
 	filter := FilterPages{
 		Filter: Filter{Property: "State", Status: Status{"Not started"}},
 	}
 	qr, _ := FetchPages(client, filter, id, key)
-	fetchedPages := qr.Results
+	// fetchedPages := qr.Results
 	db, _ := FetchDatabase(client, id, key)
+	// dbName := db.Title[0].Text.Content
+
+	return qr, db
+}
+
+func PrintBoard(qr QueryResult, db Database) {
+	blueBg := color.New(color.BgBlue).SprintFunc()
+	blueFg := color.New(color.FgBlue).SprintFunc()
+
+	fetchedPages := qr.Results
 	dbName := db.Title[0].Text.Content
 	fmt.Println("Board: ", blueFg(dbName))
 	for i := range fetchedPages {
-		// fmt.Printf("%s\n", fetchedPages[i].Properties.Name.Title[0].Text.Content)
 		fmt.Printf(
 			"%s  %s  %s\n",
-			// padding(fetchedPages[i].Properties.State.Status.Name),
-			// blueFg(fetchedPages[i].CreatedTime.Format("(Mon) 2 Jan 2006 15:04:05")),
 			blueBg(padding(fetchedPages[i].Properties.Name.Title[0].Text.Content)),
 			fetchedPages[i].CreatedTime.Format("2006-01-02 15:04:05"),
-			// blueBg(padding(fetchedPages[i].Properties.Name.Title[0].Text.Content)),
 			fetchedPages[i].Url,
 		)
 	}

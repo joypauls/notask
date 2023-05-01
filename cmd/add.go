@@ -5,17 +5,17 @@ import (
 
 	"github.com/joypauls/notask/src"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
-var addPageCmd = &cobra.Command{
-	Use:     "addPage",
-	Aliases: []string{"add"},
-	Short:   "Print the version number of Hugo",
-	Long:    `All software has versions. This is Hugo's`,
-	Args:    cobra.ExactArgs(1),
+var addCmd = &cobra.Command{
+	Use:   "add",
+	Short: "Print the version number of Hugo",
+	Long:  `All software has versions. This is Hugo's`,
+	Args:  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-		apiKey := src.ReadDotEnvFile("NOTION_API_KEY")
-		databasedId := src.ReadDotEnvFile("NOTION_DATABASE_ID")
+		apiKey := viper.GetString("NOTION_API_KEY")
+		databasedId := viper.GetString("NOTION_DATABASE_ID")
 		// fmt.Println(args[0])
 		newPage := src.PageRequest{
 			Parent:     src.Parent{DatabaseId: databasedId},
@@ -27,5 +27,5 @@ var addPageCmd = &cobra.Command{
 }
 
 func init() {
-	rootCmd.AddCommand(addPageCmd)
+	rootCmd.AddCommand(addCmd)
 }

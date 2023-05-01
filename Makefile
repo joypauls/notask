@@ -8,7 +8,9 @@ build:
 run:
 	go build -o ${EXECUTABLE_NAME}
 	./${EXECUTABLE_NAME} version
+	# ./${EXECUTABLE_NAME}
 	# ./${EXECUTABLE_NAME} add "This is a new task."
+	echo ""
 	./${EXECUTABLE_NAME} board
 
 dev-setup:
