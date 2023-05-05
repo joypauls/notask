@@ -5,12 +5,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"os"
+	"text/tabwriter"
 
 	"github.com/fatih/color"
-	"github.com/joho/godotenv"
 )
 
 // // This is overwritten at compile time with build flags with the current tag
@@ -60,20 +59,6 @@ import (
 // 		log.Fatal("Too many arguments supplied - zero(0) or one(1) required")
 // 	}
 // }
-
-// use godot package to load/read the .env file and
-// return the value of the key
-func ReadDotEnvFile(key string) string {
-
-	// load .env file
-	err := godotenv.Load(".env")
-
-	if err != nil {
-		log.Fatalf("Error loading .env file")
-	}
-
-	return os.Getenv(key)
-}
 
 func FetchDatabase(client *http.Client, id string, key string) (Database, error) {
 	requestURL := fmt.Sprintf("https://api.notion.com/v1/databases/%s", id)
@@ -170,18 +155,36 @@ func FetchBoard(client *http.Client, id string, key string) (QueryResult, Databa
 }
 
 func PrintBoard(qr QueryResult, db Database) {
-	blueBg := color.New(color.BgBlue).SprintFunc()
+	// blueBg := color.New(color.BgBlue).SprintFunc()
 	blueFg := color.New(color.FgBlue).SprintFunc()
+	whiteFg := color.New(color.FgWhite).SprintFunc()
 
 	fetchedPages := qr.Results
-	dbName := db.Title[0].Text.Content
-	fmt.Println("Board: ", blueFg(dbName))
+	maxTitleLength := 1
+	for _, page := range fetchedPages {
+		titleLength := len(page.Properties.Name.Title[0].Text.Content)
+		if titleLength > maxTitleLength {
+			maxTitleLength = titleLength
+		}
+	}
+
+	// fmt.Printf("\n------------\n%s [%s]\n------------\n\n", blueFg(db.Title[0].Text.Content), db.Url)
+	fmt.Printf("\n%s: %s\n", "Board ", db.Title[0].Text.Content)
+	fmt.Printf("%s: %s\n", "Status", "Not started")
+	fmt.Printf("%s: %s\n\n", "URL   ", db.Url)
+
+	var flag uint = 0
+	// flag := tabwriter.Debug
+	writer := tabwriter.NewWriter(os.Stdout, 8, 8, 3, ' ', flag)
+	defer writer.Flush()
+
+	fmt.Fprintf(writer, "%s\t%s\t%s\n", whiteFg("Title"), "Created", "ID")
+	fmt.Fprintf(writer, "%s\t%s\t%s\n", whiteFg("-----"), "-------", "--")
 	for i := range fetchedPages {
-		fmt.Printf(
-			"%s  %s  %s\n",
-			blueBg(padding(fetchedPages[i].Properties.Name.Title[0].Text.Content)),
+		fmt.Fprintf(writer, "%s\t%s\t%s\n",
+			blueFg(fetchedPages[i].Properties.Name.Title[0].Text.Content),
 			fetchedPages[i].CreatedTime.Format("2006-01-02 15:04:05"),
-			fetchedPages[i].Url,
+			fetchedPages[i].Id,
 		)
 	}
 }

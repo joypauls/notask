@@ -1,4 +1,4 @@
-![Build Status](https://img.shields.io/github/workflow/status/joypauls/notask/Build)
+<!-- ![Build Status](https://img.shields.io/github/workflow/status/joypauls/notask/Build) -->
 ![Latest Release](https://img.shields.io/github/v/release/joypauls/notask?include_prereleases)
 [![Go Report](https://goreportcard.com/badge/github.com/joypauls/notask)](https://goreportcard.com/badge/github.com/joypauls/notask)
 <!-- ![Code Coverage](https://storage.googleapis.com/notask-build/code-coverage.svg) -->
@@ -9,13 +9,21 @@
 
 # Notask: an oversimplified Notion client
 
-Stay focused with **notask** - a distraction-free interface to manage a Notion database (such as a ![Board](https://www.notion.so/help/boards)) at the command line through ![Notion's API](https://developers.notion.com/docs/getting-started). 
+Stay focused with **notask** - a distraction-free interface to manage tasks at the command line using a Notion database (such as a [Board](https://www.notion.so/help/boards)) as a backend through [Notion's API](https://developers.notion.com/docs/getting-started). 
 
 Features:
 - View a database
 - Add a new page
 
-If you're interested in hacking on this project, make sure to check ![this](#developer-stuff) out.
+If you're interested in hacking on this project, make sure to check [this](#developer-stuff) out.
+
+## Current Limitations
+- Doesn't play nice with page/card titles that contain emoji in the title
+  - However, using the assigned page icon is *not* an issue
+- Time only in UTC
+
+## Future Additions
+- Built-in timer
 
 ## Developer Stuff
 
